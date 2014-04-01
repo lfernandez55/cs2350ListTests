@@ -1,0 +1,192 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head> 
+ <meta http-equiv="content-type" content="text/html;charset=utf-8">
+ <title>jQuery Proctor Example</title>
+ <style type="text/css">
+      body {text-align:center;}
+      table {border:2px solid black;padding:2px; margin:2px;width:600px;}
+      td{text-align:center;border:2px solid black;padding:2px; margin:2px}
+      .odd{background-color:aqua;}
+      #tests{width:600px;margin:auto;}
+  </style>
+
+ 
+ <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+ <script type="text/javascript">
+		function getTests(testparam){
+				$.ajax({
+					url: "tests",
+					type: "GET",
+					dataType: "json",
+          data: ({
+						testname: testparam
+					}),
+					error: function(XMLHttpRequest, textStatus, errorThrown){
+						    alert("Request failed: " + textStatus);
+					},
+					success: function(response){
+        				var isIE = /msie/gi.test(navigator.userAgent);
+        	      if (isIE == false){
+        				  console.log(response);
+        				}
+        				parseAndOutputResponse(response);
+					}
+				});
+		}
+		
+		function parseAndOutputResponse(tests){
+        console.log(tests);
+        if (tests == null){
+          document.getElementById('tests').innerHTML="No test results returned";
+        }else{
+  				var testsString = "";
+  		    for(x=0;x<tests.length;x++){
+              if (x%2 == 0){
+                //var newDate = new Date(tests.datetaken[x]);
+                testsString = testsString + "<tr class=\"even\"><td class=col1>" + tests[x].testname + "</td><td class=col2> " + tests[x].date + "</td><td class=col3> " + tests[x].timeElapsed + "</td></tr>";
+              }else
+              {
+                testsString = testsString + "<tr class=\"odd\"><td class=col1>" + tests[x].testname +  "</td><td class=col2> " + tests[x].date + "</td><td class=col3> " + tests[x].timeElapsed + "</td></tr>";
+              }
+              
+  				}	
+          document.getElementById('tests').innerHTML="<table><tr><td>Name</td><td>When Taken</td><td>Time Elapsed</td></tr>" + testsString + "</table>";
+				
+        }	
+				
+				
+		}
+ </script>
+</head>
+<body bgcolor="white" >
+<input type="text" id='testname'>
+<input type="button" value="Type in 'CSS' or 'XHTML' to get test results" onclick="getTests(document.getElementById('testname').value)">
+<div id="tests"></div>
+</body>
+</html>
+
+
+<!-- 
+<!DOCTYPE HTML>
+<html>
+<title>Main Pagexxzzddd</title>
+<head>
+	 <style type="text/css">
+	      body {text-align:center;}
+	      table {border:2px solid black;padding:2px; margin:2px;width:600px;}
+	      td{text-align:center;border:2px solid black;padding:2px; margin:2px}
+	      .odd{background-color:aqua;}
+	      #users{width:600px;margin:auto;}
+	      #create{display:none;width:600px;margin:auto}
+	      #header{margin-bottom:25px}
+	  </style>
+
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+ 	<script type="text/javascript">
+		function runSQL(requestMode,userID){
+
+				hideShow(requestMode);
+
+				$.ajax({
+					url: "crud",
+					type: "GET",
+					dataType: "json",
+          			data: ({
+						requestType : requestMode,
+						id : userID,
+						firstname : document.getElementById('firstname').value,
+						lastname : document.getElementById('lastname').value,
+						institution : document.getElementById('institution').value
+					}),
+					error: function(XMLHttpRequest, textStatus, errorThrown){
+						    alert("Request failed: " + textStatus);
+					},
+					success: function(response){
+        				var isIE = /msie/gi.test(navigator.userAgent);
+        	      		if (isIE == false){
+        				  console.log(response);
+        				}
+        				if (requestMode == 'showUsers') {
+        					parseAndOutputResponse(response);
+        				} else {
+							document.getElementById('message').innerHTML=response;
+					    }
+					}
+				});
+		}
+
+		function hideShow(requestMode){
+			document.getElementById('create').style.display='none';
+			document.getElementById('message').innerHTML='';
+			document.getElementById('createButton').style.display='none';
+			document.getElementById('updateButton').style.display='none';
+			if (requestMode == 'createUsers'){
+				document.getElementById('createButton').style.display='inline-block';				
+				document.getElementById('create').style.display='block';
+
+			} else if (requestMode == 'updateUsers'){
+				document.getElementById('updateButton').style.display='inline-block';
+				document.getElementById('create').style.display='block';
+				
+			}
+		}
+
+
+		function update(id,firstname,lastname,institution){
+			document.getElementById('userid').value=id;
+			document.getElementById('firstname').value=firstname;
+			document.getElementById('lastname').value=lastname;
+			document.getElementById('institution').value=institution;
+			hideShow('updateUsers');
+		}
+
+		function parseAndOutputResponse(users){
+			var userString = "";
+		    for(x=0;x<users.length;x++){
+	            if (x%2 == 0){
+	              userString = userString + "<tr class=\"even\"><td class=col1>" + users[x].id + "</td> <td class=col1>" + users[x].firstname + " " + users[x].lastname + "</td><td class=col2> " + users[x].institution + "</td><td><a href='#' onclick=\"runSQL(\'delete\'," + users[x].id + ")\" >D</a></td><td><a href='#' onclick=\"update(" + users[x].id + ",\'"+ users[x].firstname + "\',\'" +  users[x].lastname + "\',\'" +  users[x].institution + "\'" + " )\" >U</a></td></tr>";
+	            }else
+	            {
+	              userString = userString + "<tr class=\"odd\"><td class=col1>" + users[x].id + "</td> <td class=col1>" + users[x].firstname + " " + users[x].lastname + "</td><td class=col2> " + users[x].institution + "</td><td><a href='#' onclick=\"runSQL(\'delete\'," + users[x].id + ")\" >D</a></td><td><a href='#' onclick=\"update(" + users[x].id + ",\'"+ users[x].firstname + "\',\'" +  users[x].lastname + "\',\'" +  users[x].institution + "\'" + " )\" >U</a></td></tr>";
+	            
+	            }
+	        
+			}		
+			document.getElementById('message').innerHTML="<table id='users'><thead><td>id</td><td>Name</td><td>Institution</td><td>Delete User</td><td>Update User</td></thead>" + userString + "</table>";
+				
+				
+		}
+         //<td><a href='#' onclick=\"update(" + users[x].id + ",\'"+ users[x].firstname + "\',\'" + users[x].firstname + "\',\'" + users[x].institution + "\'" )\" >Update</a></td>
+ </script>
+</head>
+<body>
+
+<h1>A simple node.js server </h1>
+<h3>(with some sql crud methods)</h3>
+<div id="header">
+<a href="##" onclick="runSQL('createTable')"  >Create Users Table</a> | <a href="##" onclick="runSQL('dropTable')"  >Drop Users Table</a>   |  <a href="##" onclick="hideShow('createUsers')"  >Create Users</a> |  <a href="##" onclick="runSQL('showUsers')" >Show Users</a> | <a href="/users" >Return JSON all Users</a> | <a href="/users?lastname=mouse" >Return JSON all Users With lastname='mouse'</a>
+</div>
+
+<div id="create">
+	 <form>  
+		ID: <input type="text" id="userid"><br/>
+		First name: <input type="text" id="firstname"><br/>
+		Last name: <input type="text" id="lastname"><br/>
+		Institution: <input type="text" id="institution"><br/>
+		<input type="button" id="createButton" value="Create" onclick="runSQL('createUser')">
+		<input type="button" id="updateButton" value="Update" onclick="runSQL('updateUser',document.getElementById('userid').value)">
+	 </form>
+</div>
+
+<div id="message">
+</div>
+
+
+
+
+
+
+
+</body>
+</html> -->
